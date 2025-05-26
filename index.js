@@ -13,7 +13,7 @@ const client = new dialogflow.SessionsClient({
 
 const projectId = process.env.PROJECT_ID;
 
-app.post('/mia', async (req, res) => {
+app.post('/webhook', async (req, res) => {
   const sessionId = Date.now().toString();
   const sessionPath = client.projectAgentSessionPath(projectId, sessionId);
 
