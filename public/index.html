@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Asistente MIA</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f2f2f2;
+      text-align: center;
+      padding: 50px;
+    }
+
+    h1 {
+      color: #333;
+    }
+
+    #output {
+      margin-top: 20px;
+      padding: 20px;
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    button {
+      background-color: #ff6600;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      font-size: 16px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #e65c00;
+    }
+  </style>
+</head>
+<body>
+  <h1>Hola, soy <strong>MIA</strong></h1>
+  <p>Presiona el botón para hablar conmigo</p>
+
+  <div id="output">🎙 Esperando entrada de voz...</div>
+
+  <button onclick="startRecognition()">🎤 Pregúntale a MIA</button>
+
+  <script>
+    const output = document.getElementById('output');
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+    if (!SpeechRecognition) {
+      output.innerHTML = 'Tu navegador no soporta reconocimiento de voz.';
+    } else {
+      const recognition = new SpeechRecognition();
+      recognition.lang = 'es-CL';
+      recognition.interimResults = false;
+
+      recognition.onstart = () => {
+        output.innerHTML = '🎧 Escuchando...';
+      };
+
+      recognition.onresult = (event) => {
+        const texto = event.results[0][0].transcript;
+        output.innerHTML = `🧑 Tú: ${texto}`;
+        contactarBackend(texto);
+      };
+
+      recognition.onerror = (event) => {
+        output.innerHTML = `❌ Error al reconocer voz: ${event.error}`;
+      };
+
+      window.startRecognition = () => recognition.start();
+    }
+
+    async function contactarBackend(texto) {
+      try {
+        const respuesta = await fetch('http://localhost:3001/mia', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ query: texto })
+        });
+
+        const datos = await respuesta.json();
+        const mensaje = datos.reply || 'Lo siento, no entendí eso.';
+
+        output.innerHTML += `<br>🤖 MIA: ${mensaje}`;
+
+        const voz = new SpeechSynthesisUtterance(mensaje);
+        voz.lang = 'es-CL';
+        speechSynthesis.speak(voz);
+      } catch (error) {
+        output.innerHTML += `<br>❌ Error al contactar a MIA: ${error.message}`;
+      }
+    }
+  </script>
+</body>
+</html>
