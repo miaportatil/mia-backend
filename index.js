@@ -7,9 +7,16 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
+const credentialsJSON = Buffer.from(process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON, 'base64').toString('utf-8');
+const credentials = JSON.parse(credentialsJSON);
+
 const client = new dialogflow.SessionsClient({
-  keyFilename: 'mia-gtbh-6a391b18aeac.json'
+  credentials: {
+    client_email: credentials.client_email,
+    private_key: credentials.private_key
+  }
 });
+
 
 const projectId = process.env.PROJECT_ID;
 
