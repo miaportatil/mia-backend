@@ -15,9 +15,19 @@ const projectId = process.env.PROJECT_ID;
 
 app.post('/webhook', async (req, res) => {
   const sessionId = Date.now().toString();
+
+if (!projectId) {
+  console.error('❌ PROJECT_ID no está definido. Revisa tu archivo .env o variable de entorno.');
+  return res.status(500).json({ reply: 'Error interno de configuración. Falta PROJECT_ID.' });
+}
   const sessionPath = client.projectAgentSessionPath(projectId, sessionId);
 
   const { query } = req.body;
+
+if (!query) {
+  return res.status(400).json({ reply: 'No recibí ninguna pregunta.' });
+}
+
 
   const request = {
     session: sessionPath,
@@ -32,6 +42,10 @@ app.post('/webhook', async (req, res) => {
   try {
     const responses = await client.detectIntent(request);
     const result = responses[0].queryResult;
+
+console.log('🎯 Respuesta Dialogflow:', result.fulfillmentText);
+
+
     res.json({ reply: result.fulfillmentText });
   } catch (error) {
     console.error('❌ Error en Dialogflow:', error);
