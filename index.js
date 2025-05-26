@@ -40,6 +40,7 @@ app.post('/mia', async (req, res) => {
 });
 
 app.use(express.static('public'));
-app.listen(3001, () => {
-  console.log('✅ MIA backend activo en http://localhost:3001');
+const PORT = process.env.PORT || 3001;
+app.listen(PORT, () => {
+  console.log(`✅ MIA backend activo en http://localhost:${PORT}`);
 });
