@@ -80,7 +80,7 @@
 
     async function contactarBackend(texto) {
       try {
-        const respuesta = await fetch('http://localhost:3001/mia', {
+        const respuesta = await fetch('https://mia-backend-51x3.onrender.com', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
